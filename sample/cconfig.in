@@ -1,0 +1,2 @@
+#define YUKI_CMD_SAMPLE_VERSION_MAJOR @yuki.cmd.sample_VERSION_MAJOR@
+#define YUKI_CMD_SAMPLE_VERSION_MINOR @yuki.cmd.sample_VERSION_MINOR@
