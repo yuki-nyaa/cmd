@@ -33,7 +33,5 @@ link_directories(${LOCAL_LIB})
 
 configure_file(cconfig.in cconfig)
 
-find_library(YUKI_CMD_FOUND yuki_cmd REQUIRED)
-
 add_executable(main main.cpp cmd.cpp)
 target_link_libraries(main yuki_cmd reflex fmt)

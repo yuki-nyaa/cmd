@@ -1,41 +1,52 @@
 %option fast unicode nodefault noline
-%option outfile="cmd.cpp" header-file="cmd.h"
-%option namespace="yuki" prefix="yuki_cmd" lexer="Cmd_Lexer" lex="lex" token-type="yuki::Cmd_Token"
+%option outfile="cmd.hpp"
+%option namespace="yuki" prefix="yuki_cmd" lexer="Cmd_Lexer" lex="lex" token-type="yuki::Cmd_Token" templated_lexer="Cmd_Lexer<Cmd_Data_t>"
 
-%code_htop{
+%code_templateclass{
+    template<typename Cmd_Data_t>
+}
+
+%code_cpptop{
+#pragma once
 #include<string>
 #include<vector>
 #include<unordered_map>
 #include<fmt/core.h>
 #ifndef YUKI_CMD_ARG_RESERVE
-#define YUKI_CMD_ARG_RESERVE 20
+#define YUKI_CMD_ARG_RESERVE 8
 #endif
 namespace yuki{
     enum struct Cmd_Token : unsigned char {FIRST,L,Sa,Sb,Sc,ARG,END,ERR_UNKNOWN_S,NIL,};
-    struct Cmd_Data_Base{
-        virtual constexpr ~Cmd_Data_Base() noexcept = 0;
-    };
-    constexpr Cmd_Data_Base::~Cmd_Data_Base() noexcept = default;
 
-    typedef void cmd_impl_t(Cmd_Data_Base&,std::vector<std::string>&);
-    typedef void cmd_first_impl_t(Cmd_Data_Base&,std::string&);
+    template<typename Cmd_Data_t>
+    using cmd_impl_t = void(Cmd_Data_t&,std::vector<std::string>&);
+    template<typename Cmd_Data_t>
+    using cmd_first_impl_t = void(Cmd_Data_t&,std::string&);
+
+    template<typename Cmd_Data_t>
     struct Cmd_Opt_Propt{
         Cmd_Token cat; // Option category
         typedef unsigned short arg_size_t;
         arg_size_t min; // Minimum number of arguments
         arg_size_t max; // Maximum number of arguments
         static constexpr arg_size_t ARG_SIZE_MAX = std::numeric_limits<arg_size_t>::max();
-        cmd_impl_t* impl; // Pointer to the function which does the actual work.
+        cmd_impl_t<Cmd_Data_t>* impl; // Pointer to the function which does the actual work.
     };
-    typedef std::unordered_map<std::string,Cmd_Opt_Propt> cmd_opt_table_t;
+
+    template<typename Cmd_Data_t>
+    using cmd_opt_table_t = std::unordered_map<std::string,Cmd_Opt_Propt<Cmd_Data_t>>;
 }
 }
 
 %code_class{
   public:
+    typedef cmd_opt_table_t<Cmd_Data_t> cmd_opt_table_t;
+    typedef cmd_first_impl_t<Cmd_Data_t> cmd_first_impl_t;
+
     Cmd_Lexer(cmd_opt_table_t&& opt_table_p,cmd_first_impl_t* first_p=nullptr,const reflex::Input& input=reflex::Input(),std::ostream& os=std::cout) : AbstractBaseLexer(input, os),opt_table(std::move(opt_table_p)),first_(first_p) {}
-    void process(Cmd_Data_Base& data, const int argc, const char** const argv);
-    void process(Cmd_Data_Base& data, const int argc, char** argv){process(data,argc,const_cast<const char** const>(argv));}
+
+    void process(Cmd_Data_t& data, int argc, char** argv);
+
     template<typename... Args>
     static void print_error_ycmd(FILE* fp,std::string_view format,const Args&... args){
         fprintf(fp,"YCMD_ERROR: ");
@@ -120,7 +131,8 @@ ne    [^=]
 #include<vector>
 #include<fmt/core.h>
 #include<yuki/print.hpp>
-void yuki::Cmd_Lexer::process(Cmd_Data_Base& cmd_data, const int argc, const char** const argv){
+template<typename Cmd_Data_t>
+void yuki::Cmd_Lexer<Cmd_Data_t>::process(Cmd_Data_t& cmd_data, const int argc, char** argv){
     if(argc>1){
         Cmd_Token token_ahead=Cmd_Token::NIL;
         std::string f_name;

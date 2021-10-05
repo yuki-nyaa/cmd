@@ -31,19 +31,12 @@ set(LOCAL_LIB /${USR}/local/lib)
 include_directories(${LOCAL_INCLUDE} ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 link_directories(${LOCAL_LIB})
 
-find_library(REFLEX_FOUND reflex REQUIRED)
-message("Be sure to use my customized RE-flex!!")
-find_library(FMT_FOUND fmt REQUIRED)
-
-add_custom_command(OUTPUT cmd.cpp cmd.h
-    COMMAND reflex ${CMAKE_CURRENT_SOURCE_DIR}/cmd.l
+add_custom_command(OUTPUT cmd.hpp
+    COMMAND reflex ${PROJECT_SOURCE_DIR}/cmd.l
     DEPENDS cmd.l
     COMMENT "RE/flex-ing cmd.l")
 add_custom_target(cmd
-    DEPENDS cmd.cpp cmd.h)
+    ALL
+    DEPENDS cmd.hpp)
 
-add_library(yuki_cmd cmd.cpp)
-target_link_libraries(yuki_cmd reflex)
-
-install(TARGETS yuki_cmd DESTINATION lib)
-install(FILES ${PROJECT_BINARY_DIR}/cmd.h DESTINATION include/yuki)
+install(FILES ${PROJECT_BINARY_DIR}/cmd.hpp DESTINATION include/yuki)
