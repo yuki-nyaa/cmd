@@ -9,7 +9,7 @@
 %code_cpptop{
 #pragma once
 #include<string>
-#include<vector>
+#include<yuki/vector.hpp>
 #include<unordered_map>
 #include<fmt/core.h>
 #ifndef YUKI_CMD_ARG_RESERVE
@@ -19,7 +19,7 @@ namespace yuki{
     enum struct Cmd_Token : unsigned char {FIRST,L,Sa,Sb,Sc,ARG,END,ERR_UNKNOWN_S,NIL,};
 
     template<typename Cmd_Data_t>
-    using cmd_impl_t = void(Cmd_Data_t&,std::vector<std::string>&);
+    using cmd_impl_t = void(Cmd_Data_t&,yuki::Vector<std::string>&);
     template<typename Cmd_Data_t>
     using cmd_first_impl_t = void(Cmd_Data_t&,std::string&);
 
@@ -136,7 +136,7 @@ void yuki::Cmd_Lexer<Cmd_Data_t>::process(Cmd_Data_t& cmd_data, const int argc, 
     if(argc>1){
         Cmd_Token token_ahead=Cmd_Token::NIL;
         std::string f_name;
-        std::vector<std::string> args; args.reserve(YUKI_CMD_ARG_RESERVE);
+        yuki::Vector<std::string> args(yuki::reserve_tag,YUKI_CMD_ARG_RESERVE);
         bool stall=false;
 
         for(int i=1; i<=argc-1; ++i){

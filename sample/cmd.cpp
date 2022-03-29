@@ -8,7 +8,7 @@ namespace cmd_impl{
         cmd_data.filename=filename;
         fmt::print(stdout,"filename: {}\n",cmd_data.filename);
     }
-    void version(Cmd_Data&,std::vector<std::string>&){
+    void version(Cmd_Data&,yuki::Vector<std::string>&){
         fmt::print(stdout,"yuki.cmd.sample version {}.{}\n",YUKI_CMD_SAMPLE_VERSION_MAJOR,YUKI_CMD_SAMPLE_VERSION_MINOR);
     }
 }
@@ -24,7 +24,7 @@ namespace cmd_impl2{
         cmd_data2.filename.append("(another)");
         fmt::print(stdout,"filename(another): {}\n",cmd_data2.filename);
     }
-    void version(Cmd_Data2&,std::vector<std::string>&){
+    void version(Cmd_Data2&,yuki::Vector<std::string>&){
         fmt::print(stdout,"yuki.cmd.sample version {}.{} (another)\n",YUKI_CMD_SAMPLE_VERSION_MAJOR,YUKI_CMD_SAMPLE_VERSION_MINOR);
     }
 }
