@@ -8,28 +8,20 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wextra -g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 if(NOT CMAKE_BUILD_TYPE)
-    message("No build type specified. Defaulted to 'Debug'.")
-    set(CMAKE_BUILD_TYPE Debug)
+    message("No build type specified. Defaulted to 'Release'.")
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(YUKI_CMD_DBG TRUE)
+    set(YUKI_PG_DBG TRUE)
     message("Build type: Debug")
 else()
-    set(YUKI_CMD_DBG FALSE)
+    set(YUKI_PG_DBG FALSE)
     message("Build type: Release")
 endif()
 
-if(MINGW)
-    set(USR "mingw64")
-else()
-    set(USR "usr")
-endif()
-set(LOCAL_INCLUDE /${USR}/local/include)
-set(LOCAL_LIB /${USR}/local/lib)
-
-include_directories(${LOCAL_INCLUDE} ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-link_directories(${LOCAL_LIB})
+include_directories(/usr/local/include ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+link_directories(/usr/local/lib)
 
 add_custom_command(OUTPUT cmd.hpp
     COMMAND reflex ${PROJECT_SOURCE_DIR}/cmd.l
